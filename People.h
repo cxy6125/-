@@ -70,9 +70,33 @@ public:
 	double getscore4() { return score[3]; }
 	void addstudentnum() { studentnum++; }//添加学生数
 	void deletestudentnnum() { studentnum--; }//删除学生数
+	string changeID()//修改学号
+	{
+		string id;
+		cout << "请输入修改后的学号：";
+		cin >> id;
+		ID = id;
+		return ID;
+	}
+	char changegender()//修改性别
+	{
+		char g;
+		cout << "请输入修改后的性别：";
+		cin >> g;
+		gender=g;
+		return gender;
+	}
+	string changeclass()//修改班级
+	{
+		string classna;
+		cout << "请输入修改后的班级：";
+		cin >> classna;
+		classname=classna;
+		return classname;
+	}
 	void display()
 	{
-		cout << "姓名：" << name << "性别：" << gender << " 学号：" << ID << "班级：" << classname << "四门课程成绩：";
+		cout << "姓名：" << name << " 性别：" << gender  << " 学号：" << ID << " 班级：" << classname << " 四门课程成绩：";
 		for (int i = 0; i < 4; i++)
 		{
 			cout << score[i] << " ";
@@ -84,9 +108,10 @@ public:
 class Manager :public People
 {
 public:
+	friend class Student;
 	string pass;
 	Manager* next;
-	Manager(string name1 = "null", string id = "null", string p = "123456") :People(name, ID), pass(p) {}
+	Manager(string name1 = "null", string id = "null", string p = "123456") :People(name1, id), pass(p) {}
 	void changepass()//修改密码
 	{
 		string p;

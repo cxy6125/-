@@ -1,4 +1,16 @@
 #include "List.h"
+//通过id查找学生并返回指针
+Student* StudentList::findStudentID(string id)
+{
+	for (Student* m = head; m; m = m->next)
+	{
+		if (m->ID == id)
+		{
+			return m;
+		}
+	}
+	return nullptr;
+}
 //查找学生
 void StudentList::find(int i)
 {
@@ -123,10 +135,10 @@ void StudentList::tihuanFile(string filename)
 		infile.close();
 	}
 }
-///写入文本
+//写入文本
 void StudentList::saveToFile(string filename)
 {
-	ofstream infile(filename);
+	ofstream infile(filename,ios::out);
 	if (!infile)
 	{
 		cerr << "open error!" << endl;
@@ -286,11 +298,11 @@ StudentList::~StudentList()
 }
 ////////////////////////////////////////////////////////////////////////////////////
 //查找教师信息
-Teacher* Teacherlist::find(Teacher& a)
+Teacher* Teacherlist::findteacher(string id)
 {
 	for (Teacher* m = head; m; m = m->next)
 	{
-		if (m->ID == a.ID)
+		if (m->ID == id)
 			return m;
 	}
 	return nullptr;
@@ -321,6 +333,8 @@ void Teacherlist::load(string id,string password)
 {
 	StudentList studentlist;
 	studentlist.loadFromFile("student.txt");
+	string ID;
+	double changescore[4];
 	if (yanzheng(id,password))
 	{
 		Teacher* teacher;
@@ -342,7 +356,8 @@ void Teacherlist::load(string id,string password)
 			cout << "4.查询学生信息" << endl;
 			cout << "5.按成绩排序" << endl;
 			cout << "6.按学号排序" << endl;
-			cout << "请选择（1/2/3/4/5/6,输入-1返回上层结构）：";
+			cout << "7.修改学生成绩" << endl;
+			cout << "请选择（1/2/3/4/5/6/7,输入-1返回上层结构）：";
 			cin >> n;
 			switch (n)
 			{
@@ -426,6 +441,26 @@ void Teacherlist::load(string id,string password)
 					fh = -1;
 				}
 				break;
+			case 7:
+				while (fh != -1)
+				{
+					cout << "请输入想修改成绩的学生ID:";
+					cin >> ID;
+					cout << "请输入修改后的四门课成绩：";
+					Student *m=studentlist.findStudentID(ID);
+					for (int i = 0; i < 4; i++)
+					{
+						cin >> changescore[i];
+						m->score[i] = changescore[i];
+					}
+					studentlist.saveToFile("student.txt");
+					cout << "修改成功！" << endl;
+					m->display();
+					cout << "按任意键返回" << endl;
+					cin >> fh;
+					fh = -1;
+				}
+				break;
 			case -1:
 				fh = -1;
 				break;
@@ -443,6 +478,40 @@ void Teacherlist::load(string id,string password)
 	{
 		cout << "用户名或密码错误，登录失败！" << endl;
 	}
+}
+//删除教师
+void Teacherlist::deleteTeacherID(string id)
+{
+	if (head == nullptr)//如果头节点为空
+	{
+		return;
+	}
+	if (head->ID == id)//如果要删除节点为头节点
+	{
+		Teacher* temp = head;
+		head = head->next;
+		delete temp;
+		cout << "删除成功！" << endl;
+		write();// 文件中数据同步
+		return;
+	}
+	Teacher* current = head;//要删除节点不是头节点
+	while (current->next != nullptr && current->next->ID != id)
+	{
+		current = current->next;
+	}
+	if (current->next == nullptr)//如果没有符合的删除节点
+	{
+		cout << "删除失败，未找到该教师！" << endl;
+		return;
+	}
+	//找到了删除的节点
+	Teacher* temp = current->next;
+	current->next = current->next->next;
+	delete temp;
+	cout << "删除成功！" << endl;
+	write();//文件中数据同步
+	return;
 }
 void Teacherlist::write()
 {
@@ -497,6 +566,7 @@ void Teacherlist::loadFromFile(string filename)
 		infile.close();
 	}
 }
+//写入文本
 
 /////////////////////////////////////
 //查找管理员的信息
@@ -537,6 +607,9 @@ bool Managerlist::yanzheng(string id, string password)
 void Managerlist::load(string id,string password)
 {
 	StudentList studentlist;
+	Teacherlist teacherlist;
+	Student student;
+	Teacher teacher;
 	studentlist.loadFromFile("student.txt");
 	if (yanzheng(id, password))
 	{
@@ -547,20 +620,20 @@ void Managerlist::load(string id,string password)
 			if (manager->ID == id)
 				break;
 		}
-		int n = 0, n4 = 0, fh = 0;
-		string name, ID, classname;
+		int n = 0, n4 = 0, fh = 0,n5=0;
+		string name, ID, classname,pass;
 		char gender;
 		double s[4];
 		while (n != -1)
 		{
 			n4 = 0;
+			n5 = 0;
 			cout << "1.显示个人信息" << endl;
 			cout << "2.修改密码" << endl;
 			cout << "3.修改名字" << endl;
-			cout << "4.管理学生成绩" << endl;
-			cout << "5.维护学生信息" << endl;
-			cout << "6.维护老师信息" << endl;
-			cout << "请选择（1/2/3/4/5/6,输入-1返回上一层结构）：" << endl;
+			cout << "4.维护学生信息" << endl;
+			cout << "5.维护老师信息" << endl;
+			cout << "请选择（1/2/3/4/5/,输入-1返回上一层结构）：" << endl;
 			cin >> n;
 			fh = 0;
 			switch (n)
@@ -575,7 +648,6 @@ void Managerlist::load(string id,string password)
 				}
 				break;
 			case 2:
-			{
 				while (fh != -1)
 				{
 					manager->changepass();
@@ -597,60 +669,251 @@ void Managerlist::load(string id,string password)
 					fh = -1;
 				}
 				break;
-			}
-			if (n == 4)
-			{
-				while (n4 != -1)
+			case 4:
+				while (fh != -1)
 				{
-					fh = 0;
-					cout << "1.添加学生" << endl;
-					cout << "2.删除学生" << endl;
-					cout << "3.修改学生信息" << endl;
-					cout << "请选择1/2/3，输入-1返回上层结构：";
-					cin >> n4;
-					switch (n4)
+					while (n4 != -1)
 					{
-					case1:
-						while (fh != -1)
+						fh = 0;
+						cout << "1.添加学生" << endl;
+						cout << "2.删除学生" << endl;
+						cout << "3.修改学生信息" << endl;
+						cout << "请选择1/2/3，输入-1返回上层结构：";
+						cin >> n4;
+						switch (n4)
 						{
-						    cout << "请输入新加入学生的姓名：";
-							cin >> name;
-							cout << "请输入新加入学生学号：";
-							cin >> ID;
-							cout << "请输入新加入学生性别：";
-							cin >> gender;
-							cout << "请输入新加入学生班级：";
-							cin >> classname;
-							cout << "请输入四门课程成绩:";
-							for (int k = 0; k < 4; k++)
+						case 1:
+							while (fh != -1)
 							{
-								cin>>s[k];
+								cout << "请输入新加入学生的姓名：";
+								cin >> name;
+								cout << "请输入新加入学生学号：";
+								cin >> ID;
+								cout << "请输入新加入学生性别：";
+								cin >> gender;
+								cout << "请输入新加入学生班级：";
+								cin >> classname;
+								cout << "请输入四门课程成绩:";
+								for (int k = 0; k < 4; k++)
+								{
+									cin >> s[k];
+								}
+								Student* student = new Student(name, ID, gender, classname, s);
+								studentlist.addStudent(student);
+								studentlist.saveToFile("student.txt");
+								cout << "添加成功！" << endl;
+								student->display();
+								cout << "输入任意数字返回" << endl;
+								cin >> fh;
+								fh = -1;
 							}
-							Student* student = new Student(name, ID, gender, classname,s);
-							studentlist.addStudent(student);
-							studentlist.saveToFile("student");
-							cout << "输入任意数字返回" << endl;
-							cin >> fh;
-							fh = -1;
+							break;
+						case 2:
+							while (fh != -1)
+							{
+								cout << "请输入要删除学生学号：";
+								cin >> ID;
+								studentlist.deleteStudentID(ID);
+								cout << "输入任意数字返回" << endl;
+								cin >> fh;
+								fh = -1;
+							}
+							break;
+						case 3:
+							while (fh != -1)
+							{
+								cout << "请输入要修改学生的什么信息？(输入1/2/3,输入-1返回上层结构）" << endl;
+								cout << "1.修改姓名" << endl;
+								cout << "2.修改性别" << endl;
+								cout << "3.修改班级" << endl;
+								int a;
+								cin >> a;
+								Student* a1, * a2, * a3;
+								switch (a)
+								{
+								case 1:
+									cout << "请输入要改姓名的学生学号:" << endl;
+									cin >> ID;
+									a1 = studentlist.findStudentID(ID);
+									if (a1)
+									{
+										a1->changeName();
+										cout << "修改成功！" << endl;
+										a1->display();
+										studentlist.saveToFile("student.txt");
+									}
+									else
+										cout << "未找到该学生！" << endl;
+									cout << "输入任意数字返回" << endl;
+									cin >> fh;
+									fh = -1;
+									break;
+								case 2:
+									cout << "请输入要改性别的学生学号:" << endl;
+									cin >> ID;
+									a2 = studentlist.findStudentID(ID);
+									if (a2)
+									{
+										a2->changegender();
+										cout << "修改成功！" << endl;
+										a2->display();
+										studentlist.saveToFile("student.txt");
+									}
+									else
+										cout << "未找到该学生！" << endl;
+									cout << "输入任意数字返回" << endl;
+									cin >> fh;
+									fh = -1;
+									break;
+								case 3:
+									cout << "请输入要改性别的学生学号:" << endl;
+									cin >> ID;
+									a3 = studentlist.findStudentID(ID);
+									if (a3)
+									{
+										a3->changeclass();
+										cout << "修改成功！" << endl;
+										a3->display();
+										studentlist.saveToFile("student.txt");
+									}
+									else
+										cout << "未找到该学生！" << endl;
+									cout << "输入任意数字返回" << endl;
+									cin >> fh;
+									fh = -1;
+									break;
+								case -1:
+									fh = -1;
+									break;
+								default:
+									cout << "输入错误！" << endl;
+									cout << "输入任意数字返回" << endl;
+									cin >> fh;
+									fh = -1;
+									break;
+								}
+								fh = -1;
+							}
+
 						}
-						break;
-					case 2:
-						while (fh != -1)
+					
+					}
+					fh = -1;
+				}
+				break;
+			case 5:
+				while (fh != -1)
+				{
+					while (n5 != -1)
+					{
+						fh = 0;
+						cout << "1.添加教师" << endl;
+						cout << "2.删除教师" << endl;
+						cout << "3.修改教师信息" << endl;
+						cout << "请选择1/2/3，输入-1返回上层结构：";
+						cin >> n5;
+						switch (n5)
 						{
-							cout << "请输入要删除学生学号：";
-							cin >> ID;
-							studentlist.deleteStudentID(ID);
-							cout << "输入任意数字返回" << endl;
-							cin >> fh;
-							fh = -1;
+						case 1:
+							while (fh != -1)
+							{
+								cout << "请输入新加入教师的姓名：";
+								cin >> name;
+								cout << "请输入新加入教师的ID：";
+								cin >> ID;
+								cout << "请输入新加入教师的密码：";
+								cin >> pass;
+								Teacher* teacher = new Teacher(name,ID,pass);
+								teacherlist.addTeacher(teacher);
+								teacherlist.write();
+								cout << "添加成功！" << endl;
+								teacher->display();
+								cout << "输入任意数字返回" << endl;
+								cin >> fh;
+								fh = -1;
+							}
+							break;
+						case 2:
+							while (fh != -1)
+							{
+								cout << "请输入要删除教师的ID：";
+								cin >> ID;
+								teacherlist.deleteTeacherID(ID);
+								cout << "输入任意数字返回" << endl;
+								cin >> fh;
+								fh = -1;
+							}
+							break;
+						case 3:
+							while (fh != -1)
+							{
+								cout << "请输入要修改教师的什么信息？(输入1/2,输入-1返回上层结构）" << endl;
+								cout << "1.修改姓名" << endl;
+								cout << "3.修改密码" << endl;
+								int b;
+								cin >> b;
+								Teacher* b1, * b2;
+								switch (b)
+								{
+								case 1:
+									cout << "请输入要改姓名的教师ID:" << endl;
+									cin >> ID;
+									b1 = teacherlist.findteacher(ID);
+									if (b1)
+									{
+										b1->changeName();
+										cout << "修改成功！" << endl;
+										b1->display();
+										teacherlist.write();
+									}
+									else
+										cout << "未找到该教师！" << endl;
+									cout << "输入任意数字返回" << endl;
+									cin >> fh;
+									fh = -1;
+									break;
+								case 2:
+									cout << "请输入要改密码的教师ID:" << endl;
+									cin >> ID;
+									b2 = teacherlist.findteacher(ID);
+									if (b2)
+									{
+										b2->changePass();
+										cout << "修改成功！" << endl;
+										b2->display();
+										teacherlist.write();
+									}
+									else
+										cout << "未找到该教师！" << endl;
+									cout << "输入任意数字返回" << endl;
+									cin >> fh;
+									fh = -1;
+									break;
+								case -1:
+									fh = -1;
+									break;
+								default:
+									cout << "输入错误！" << endl;
+									cout << "输入任意数字返回" << endl;
+									cin >> fh;
+									fh = -1;
+									break;
+								}
+								fh = -1;
+							}
+
 						}
-						break;
 
 					}
+					fh = -1;
 				}
-			}
+				break;
 			}
 		}
+	}
+	else
+	{
+		cout << "用户名或密码错误，登录失败！" << endl;
 	}
 }
 void Managerlist::display()
@@ -662,7 +925,7 @@ void Managerlist::display()
 }
 void Managerlist::write()
 {
-	ofstream infile("teacher.txt", ios::out);
+	ofstream infile("Manager.txt", ios::out);
 	if (!infile)
 	{
 		cerr << "open error!" << endl;

@@ -128,10 +128,13 @@ int main()
 				}
 			}
 			break;
+		case -1:
+			i1 = -1;
+			break;
 		default:
 			cout << "ÊäÈë´íÎó" << endl;
-			i1 = -1;
 			break;
 		}
 	}
+	cout << "Ğ»Ğ»Ê¹ÓÃ£¡" << endl;
 }

@@ -9,7 +9,7 @@ public:
 	void addStudent(Student* student);//添加学生信息
 	void deleteStudentID(string id);//根据学号删除学生信息
 	void find(int i);//查找
-	//Student* findStudent(int i);//查找学生
+	Student* findStudentID(string id);//通过id查找学生并返回指针
 	void saveToFile(string filename);//将学生信息写到文件中
 	void tihuanFile(string filename);//更新文本信息
     void loadFromFile(string filename);	//从文件中加载学生信息
@@ -34,7 +34,7 @@ public:
 	void display();
 	Manager* find(Manager& a);//查找
 	bool yanzheng(string id, string password);//验证是否用户名与密码一致
-	void write();//写入文件
+	void write();//写入文本
 	void addManager(Manager* manager);
 	void loadFromFile(string filename);//加载文件
 	~Managerlist();
@@ -46,13 +46,12 @@ private:
 	Teacher* head;
 public:
 	Teacherlist():head(nullptr),size(0){}
-	Teacher* find(Teacher& a);
+	Teacher* findteacher(string id);
 	bool yanzheng(string id, string password);//验证是否用户名与密码一致
-	void write();
+	void write();//写入文本
 	void loadFromFile(string filename);//从文件中加载老师信息
 	void addTeacher(Teacher* teacher);//添加老师
-	//void remove(string rmv);//移除
-	//void add(Teacher& a);//添加信息到链表中
+	void deleteTeacherID(string id);//删除老师信息
 	void load(string id,string password);//登录
 	/*void Teacherdisplay();
 	~Teacherlist();*/
