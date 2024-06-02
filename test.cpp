@@ -119,12 +119,15 @@ int main()
 						{
 						case 1:
 							teacherlist.load(ID, password);
+							break;
 						case 2:
 							managerlist.load(ID, password);
+							break;
 						}
 					}
 				}
 			}
+			break;
 		default:
 			cout << "ÊäÈë´íÎó" << endl;
 			i1 = -1;
