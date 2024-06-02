@@ -83,11 +83,10 @@ public:
 };
 class Manager :public People
 {
-private:
-	string pass;
 public:
-	Manager(string name1 = "null", string id = "null", string p = "123456") :People(name, ID), pass(p) {}
+	string pass;
 	Manager* next;
+	Manager(string name1 = "null", string id = "null", string p = "123456") :People(name, ID), pass(p) {}
 	void changepass()//修改密码
 	{
 		string p;
@@ -108,9 +107,8 @@ public:
 };
 class Teacher :public People
 {
-private:
-	string pass;
 public:
+	string pass;
 	friend class Student;
 	Teacher(string nam = "null", string id = "null", string p = "123456") :People(nam, id), pass(p) {}
 	Teacher* next;
@@ -123,6 +121,14 @@ public:
 		return (pass == m.pass && ID == m.ID && name == m.name);
 
 	}
+	string changePass()//修改名字
+	{
+		string pass1;
+		cout << "请输入修改后的密码：";
+		cin >> pass1;
+		pass = pass1;
+		return pass;
+	}
 	string getpass() { return pass; }
 	void display()//显示个人信息
 	{
@@ -132,5 +138,4 @@ public:
 	{
 		return Teacher(name1, id, pass);
 	}
-
 };
